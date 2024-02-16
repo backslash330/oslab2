@@ -17,9 +17,11 @@
 // i.e. $> ./ChocolateFactory 5 5 10 100 1000
 
 typedef struct {
-    int oompa_loompas;
-    int children;
-    int assembly_line;
-    int candies_per_box;
-    int candies_per_oompa;
+    int oompa_loompas_max;
+    int children_max;
+    int assembly_line_max;
+    int candies_per_box_max;
+    int candies_per_oompa_max;
+    // we need to add the assembly line here as pthread only accepts one argument
+    int *assembly_line;
 } ChocolateFactory;

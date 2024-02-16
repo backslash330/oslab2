@@ -7,4 +7,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <ChocolateFactory.h>
+
+void *child_worker(void *factory){
+    // comfirm creation
+    printf("Child created\n");
+    pthread_exit(NULL);
+    return NULL;
+}

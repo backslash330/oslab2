@@ -11,14 +11,20 @@
 // remaining in the assembly line to get packaged then let the children go home for the day.
 // nalmeida@Desktop-Nick:~/os/lab2$ gcc charlie.c -o ChocolateFactory
 // nalmeida@Desktop-Nick:~/os/lab2$ ./ChocolateFactory 1 2 3 4 5
+
+// Library includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include "ChocolateFactory.h"
-
+#include "oompa-loompas.c"
+#include "children.c"
 
 int main(int argc, char *argv[]) {
+    // create any necessary variables
+    int status = 0;
+
     // Check that there are 5 arguments, if not, print an error message and exit
     if (argc != 6) {
         printf("Error: 5 arguments required\n");
@@ -37,26 +43,78 @@ int main(int argc, char *argv[]) {
     
     // Create a factory with the given arguments
     ChocolateFactory *factory = malloc(1 * sizeof(ChocolateFactory));
-    factory->oompa_loompas = atoi(argv[1]);
-    factory->children = atoi(argv[2]);
-    factory->assembly_line = atoi(argv[3]);
-    factory->candies_per_box = atoi(argv[4]);
-    factory->candies_per_oompa = atoi(argv[5]);
+    factory->oompa_loompas_max = atoi(argv[1]);
+    factory->children_max = atoi(argv[2]);
+    factory->assembly_line_max = atoi(argv[3]);
+    factory->candies_per_box_max = atoi(argv[4]);
+    factory->candies_per_oompa_max = atoi(argv[5]);
+
 
     // print the factory settings
     printf("Factory Settings:\n");
-    printf("Oompa Loompas: %d\n", factory->oompa_loompas);
-    printf("Children: %d\n", factory->children);
-    printf("Assembly Line: %d\n", factory->assembly_line);
-    printf("Candies per Box: %d\n", factory->candies_per_box);
-    printf("Candies per Oompa: %d\n", factory->candies_per_oompa);
+    printf("Oompa Loompas: %d\n", factory->oompa_loompas_max);
+    printf("Children: %d\n", factory->children_max);
+    printf("Assembly Line: %d\n", factory->assembly_line_max);
+    printf("Candies per Box: %d\n", factory->candies_per_box_max);
+    printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
 
+    // create the assembly line (bounded-buffer array) of size assembly_line
+    int *assembly_line = malloc(factory->assembly_line_max * sizeof(int));
+    printf("Setting assembly line to 0...\n");
+    for (int i = 0; i < factory->assembly_line_max; i++) {
+        assembly_line[i] = 0;
+        printf("Assembly Line: %d\n", assembly_line[i]);
+    }
+    // add the assembly line to the factory
+    factory->assembly_line = assembly_line;
+
+    // create the semaphores using pthread
+    pthread_mutex_t mutex;
+    pthread_mutex_init(&mutex, NULL);  
+    sem_t down;
+    sem_t up;
+    sem_init(&down, 0, 0);
+    sem_init(&up, 0, factory->assembly_line_max);
+
+    // create the oompa loompas using pthread and oompa-loompa.c
+    pthread_t oompa_loompa_threads[factory->oompa_loompas_max];
+    for(int i = 0; i < factory->oompa_loompas_max; i++) {
+        printf("Creating oompa loompa %d...\n", i);
+        status = pthread_create(&oompa_loompa_threads[i], NULL, oompa_loompa_worker, (void *)factory);
+        if (status != 0) {
+            printf("Oops.oompa loompa pthread_create returned error code %d\n", status);
+            exit(EXIT_FAILURE);
+        }
+    }
     
+    // create the children using pthread and children.c
+    pthread_t children_threads[factory->children_max];
+    for(int i = 0; i < factory->children_max; i++) {
+        printf("Creating child %d...\n", i);
+        status = pthread_create(&children_threads[i], NULL, child_worker, (void *)factory);
+        if (status != 0) {
+            printf("Oops.children pthread_create returned error code %d\n", status);
+            exit(EXIT_FAILURE);
+        }
+    }
 
 
 
+    // wait for all the oompa loompas to finish producing candies
+    for(int i = 0; i < factory->oompa_loompas_max; i++) {
+        pthread_join(oompa_loompa_threads[i], NULL);
+    }
 
+    // wait for all the candies remaining in the assembly line to get packaged
+    for(int i = 0; i < factory->children_max; i++) {
+        pthread_join(children_threads[i], NULL);
+    }
 
-    // free factory at the end
+    // free memory at the end
+    free(assembly_line);
     free(factory);
+
+
+    // exit the program
+    return 0;
 }
