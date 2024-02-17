@@ -14,7 +14,19 @@
 
 void *oompa_loompa_worker(void *factory){
     // comfirm creation
-    printf("Oompa Loompa created\n");
+    // printf("Oompa Loompa created\n");
+
+    // print the memory address for this oompa loompa
+    long unsigned rawid = pthread_self();
+    int tid = (int)rawid;
+    //printf("Oompa Loompa thread id: %d\n", tid);
+
+    // create color string (color + tid)
+
+
+    // Use the producer slide to run the critical section
+    
+
     pthread_exit(NULL);
     return NULL;
 }

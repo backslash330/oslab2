@@ -16,6 +16,12 @@
 // order: o, c, a, n, t.
 // i.e. $> ./ChocolateFactory 5 5 10 100 1000
 
+// Library includes
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+
 typedef struct {
     int oompa_loompas_max;
     int children_max;

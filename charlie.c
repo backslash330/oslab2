@@ -11,6 +11,8 @@
 // remaining in the assembly line to get packaged then let the children go home for the day.
 // nalmeida@Desktop-Nick:~/os/lab2$ gcc charlie.c -o ChocolateFactory
 // nalmeida@Desktop-Nick:~/os/lab2$ ./ChocolateFactory 1 2 3 4 5
+//gcc charlie.c -o ChocolateFactory -pthread
+
 
 // Library includes
 #include <stdio.h>
@@ -20,6 +22,10 @@
 #include "ChocolateFactory.h"
 #include "oompa-loompas.c"
 #include "children.c"
+
+// global variables
+pthread_mutex_t the_mutex;
+pthread_cond_t condc, condp;
 
 int main(int argc, char *argv[]) {
     // create any necessary variables
@@ -69,12 +75,9 @@ int main(int argc, char *argv[]) {
     factory->assembly_line = assembly_line;
 
     // create the semaphores using pthread
-    pthread_mutex_t mutex;
-    pthread_mutex_init(&mutex, NULL);  
-    sem_t down;
-    sem_t up;
-    sem_init(&down, 0, 0);
-    sem_init(&up, 0, factory->assembly_line_max);
+    pthread_mutex_init(&the_mutex, 0);  
+    pthread_cond_init(&condc, 0);
+    pthread_cond_init(&condp, 0);
 
     // create the oompa loompas using pthread and oompa-loompa.c
     pthread_t oompa_loompa_threads[factory->oompa_loompas_max];
@@ -111,8 +114,12 @@ int main(int argc, char *argv[]) {
     }
 
     // free memory at the end
+    pthread_cond_destroy(&condc);
+    pthread_cond_destroy(&condp);
+    pthread_mutex_destroy(&the_mutex);
     free(assembly_line);
     free(factory);
+
 
 
     // exit the program
