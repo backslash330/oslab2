@@ -29,5 +29,6 @@ typedef struct {
     int candies_per_box_max;
     int candies_per_oompa_max;
     // we need to add the assembly line here as pthread only accepts one argument
-    int *assembly_line;
+    char **assembly_line;
+    int assembly_line_index;
 } ChocolateFactory;

@@ -13,6 +13,8 @@
 // nalmeida@Desktop-Nick:~/os/lab2$ ./ChocolateFactory 1 2 3 4 5
 //gcc charlie.c -o ChocolateFactory -pthread
 
+// our test values need to be EVEN for the program to complete. Otherwise a child or oompa loompa will be stuck in the while loop
+// ./ChocolateFactory 5 5 10 100 100
 
 // Library includes
 #include <stdio.h>
@@ -26,6 +28,8 @@
 // global variables
 pthread_mutex_t the_mutex;
 pthread_cond_t condc, condp;
+// create a string buffer to hold a candy that can be any size 
+int buffer = 0;
 
 int main(int argc, char *argv[]) {
     // create any necessary variables
@@ -55,7 +59,6 @@ int main(int argc, char *argv[]) {
     factory->candies_per_box_max = atoi(argv[4]);
     factory->candies_per_oompa_max = atoi(argv[5]);
 
-
     // print the factory settings
     printf("Factory Settings:\n");
     printf("Oompa Loompas: %d\n", factory->oompa_loompas_max);
@@ -65,14 +68,22 @@ int main(int argc, char *argv[]) {
     printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
 
     // create the assembly line (bounded-buffer array) of size assembly_line
-    int *assembly_line = malloc(factory->assembly_line_max * sizeof(int));
-    printf("Setting assembly line to 0...\n");
+    // int *assembly_line = malloc(factory->assembly_line_max * sizeof(int));
+    // printf("Setting assembly line to 0...\n");
+    // for (int i = 0; i < factory->assembly_line_max; i++) {
+    //     assembly_line[i] = 0;
+    //     printf("Assembly Line: %d\n", assembly_line[i]);
+    // }
+
+    // create the assembly line (bounded-buffer array) of size assembly_line that holds strings
+    char **assembly_line = malloc(factory->assembly_line_max * sizeof(char *));
     for (int i = 0; i < factory->assembly_line_max; i++) {
-        assembly_line[i] = 0;
-        printf("Assembly Line: %d\n", assembly_line[i]);
+        assembly_line[i] = malloc(100 * sizeof(char));
     }
+
     // add the assembly line to the factory
     factory->assembly_line = assembly_line;
+    factory->assembly_line_index = 0;
 
     // create the semaphores using pthread
     pthread_mutex_init(&the_mutex, 0);  
@@ -100,8 +111,6 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
     }
-
-
 
     // wait for all the oompa loompas to finish producing candies
     for(int i = 0; i < factory->oompa_loompas_max; i++) {
