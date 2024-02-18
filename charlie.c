@@ -129,8 +129,7 @@ int main(int argc, char *argv[]) {
     free(assembly_line);
     free(factory);
 
-
-
     // exit the program
+    printf("Ending program correctly.\n");
     return 0;
 }

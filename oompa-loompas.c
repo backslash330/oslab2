@@ -46,7 +46,6 @@ void *oompa_loompa_worker(void *factory_ptr){
 
     // Use the producer slide to run the critical section
     int i;
-    char *i_str = malloc(20);
     // we need a string which is " - " + i to use later
     char *current_candy = malloc(strlen(color) + strlen(" - ") + 2);
     char *suffix = malloc(strlen(" - ") + 2);
@@ -56,26 +55,39 @@ void *oompa_loompa_worker(void *factory_ptr){
             pthread_cond_wait(&condp, &the_mutex);
         }
         buffer = 1;
-
-       // printf("buffer set to %d by Oompa Loompa %s\n", buffer, tid_str);
+        //printf("buffer set to %d by Oompa Loompa %s\n", buffer, tid_str);
         // This is the critical section !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //suffix = " - ";
-        // sprintf(i_str, "%d", i);
-        // printf("i_str: %s\n", i_str);
-        // printf("suffix: %s\n", suffix);
+
+        // The suffix needs to be " - " + i
+        sprintf(suffix, " - %d", i);
+        //printf("Suffix: %s\n", suffix);
+
+
+        // Allocate new memory for each candy
+        current_candy = malloc(strlen(color) + strlen(suffix) + 1);
         strcpy(current_candy, color);
         strcat(current_candy, suffix);
-        printf("Oompa Loompa %s created candy (%s)\n", tid_str, current_candy);
+        // printf("Oompa Loompa %s created candy (%s)\n", tid_str, current_candy);
+
+
         // put the candy on the assembly line in the factory 
-        factory->assembly_line[factory->assembly_line_index] = current_candy;
-        printf("Oompa Loompa %s added candy (%s) to assembly line at index %d\n", tid_str, current_candy, factory->assembly_line_index);
+        // Add the value of current_candy to the assembly line, NOT the pointer
+        // since assembly line is a char **, it takes pointer to a char
+        // However, current_candy will be freed after the critical section, so we need to copy the value of current_candy to the assembly line
+        factory->assembly_line[factory->assembly_line_index] = malloc(strlen(current_candy) + 1);
+        strcpy(factory->assembly_line[factory->assembly_line_index], current_candy);
+    
+
+        // printf("Oompa Loompa %s added candy (%s) to assembly line at index %d\n", tid_str, current_candy, factory->assembly_line_index);
         factory->assembly_line_index++;
                 // debug: check the assembly line
-        for (int j = 0; j < factory->assembly_line_max; j++) {
-            printf("Assembly line from OL %d: %s\n", j, factory->assembly_line[j]);
-        }
-        // clear the current candy and the buffer
+        // for (int j = 0; j < factory->assembly_line_max; j++) {
+        //     printf("Assembly line from OL %d: %s\n", j, factory->assembly_line[j]);
+        // }
+
+        // clear the current candy
         strcpy(current_candy, "");
+
         // signal the consumer
         pthread_cond_signal(&condc);
         pthread_mutex_unlock(&the_mutex);
@@ -86,7 +98,6 @@ void *oompa_loompa_worker(void *factory_ptr){
     free(color);
     free(current_candy);
     free(suffix);
-    free(i_str);
 
     pthread_exit(NULL);
     return NULL;
