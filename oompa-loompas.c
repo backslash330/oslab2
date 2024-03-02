@@ -50,12 +50,19 @@ void *oompa_loompa_worker(void *factory_ptr){
     char *current_candy = malloc(strlen(color) + strlen(" - ") + 2);
     char *suffix = malloc(strlen(" - ") + 2);
     for(i = 0; i < factory->candies_per_oompa_max; i++){
+
+
+        
         pthread_mutex_lock(&the_mutex);
         while (buffer != 0 || factory->assembly_line_index == factory->assembly_line_max) {
+           // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
             pthread_cond_wait(&condp, &the_mutex);
         }
         buffer = 1;
+
+        //Debug: check the buffer
         //printf("buffer set to %d by Oompa Loompa %s\n", buffer, tid_str);
+
         // This is the critical section !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         // The suffix needs to be " - " + i
@@ -94,6 +101,10 @@ void *oompa_loompa_worker(void *factory_ptr){
         // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
+
+    //There is a deadlock condition. If a child goes to sleep and the production is done, the child will never wake up.
+    // We therefore need to wake all the children up
+
     // free the memory
     free(color);
     free(current_candy);
@@ -102,29 +113,4 @@ void *oompa_loompa_worker(void *factory_ptr){
     pthread_exit(NULL);
     return NULL;
 }
-// void *oompa_loompa_worker(void *factory){
-//     // comfirm creation
-//     // printf("Oompa Loompa created\n");
 
-//     // print the memory address for this oompa loompa
-//     long unsigned rawid = pthread_self();
-//     int tid = (int)rawid;
-//     printf("Oompa Loompa memory address: %lu\n", rawid);
-//     char tid_str = (char)tid;
-//     printf("Oompa Loompa thread id: %d\n", tid_str);
-    
-//     //printf("Oompa Loompa thread id: %d\n", tid);
-
-//     // create color string (color + tid)
-//     char *color = malloc(strlen("color") + strlen(&tid_str) + 1);
-//     strcpy(color, "color");
-//     strcat(color, &tid_str);
-//     printf("Oompa Loompa color: %s\n", color);
-
-
-//     // Use the producer slide to run the critical section
-    
-
-//     pthread_exit(NULL);
-//     return NULL;
-// }

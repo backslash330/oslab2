@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     factory->assembly_line_max = atoi(argv[3]);
     factory->candies_per_box_max = atoi(argv[4]);
     factory->candies_per_oompa_max = atoi(argv[5]);
+    factory->done_production = 0;
 
     // print the factory settings
     printf("Factory Settings:\n");
@@ -66,14 +67,6 @@ int main(int argc, char *argv[]) {
     printf("Assembly Line: %d\n", factory->assembly_line_max);
     printf("Candies per Box: %d\n", factory->candies_per_box_max);
     printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
-
-    // create the assembly line (bounded-buffer array) of size assembly_line
-    // int *assembly_line = malloc(factory->assembly_line_max * sizeof(int));
-    // printf("Setting assembly line to 0...\n");
-    // for (int i = 0; i < factory->assembly_line_max; i++) {
-    //     assembly_line[i] = 0;
-    //     printf("Assembly Line: %d\n", assembly_line[i]);
-    // }
 
     // create the assembly line (bounded-buffer array) of size assembly_line that holds strings
     char **assembly_line = malloc(factory->assembly_line_max * sizeof(char *));
@@ -117,10 +110,18 @@ int main(int argc, char *argv[]) {
         pthread_join(oompa_loompa_threads[i], NULL);
     }
 
+    printf("All oompa loompas compelte.\n");
+    // set factory to done production
+    factory->done_production = 1;
+    // wake all the children up
+    pthread_cond_broadcast(&condc);
+
     // wait for all the candies remaining in the assembly line to get packaged
     for(int i = 0; i < factory->children_max; i++) {
         pthread_join(children_threads[i], NULL);
     }
+
+    printf("All threads compelte.\n");
 
     // free memory at the end
     pthread_cond_destroy(&condc);

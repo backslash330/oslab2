@@ -31,4 +31,6 @@ typedef struct {
     // we need to add the assembly line here as pthread only accepts one argument
     char **assembly_line;
     int assembly_line_index;
+    // this is for the case that their are less candies than the candies per box
+    int done_production;
 } ChocolateFactory;

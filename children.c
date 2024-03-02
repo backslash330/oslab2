@@ -13,7 +13,7 @@ void *child_worker(void *factory_ptr){
 
     // declare the factory
     ChocolateFactory *factory = (ChocolateFactory *)factory_ptr;
-
+    int break_flag = 0;
     //extern the global variables
     extern pthread_mutex_t the_mutex;
     extern pthread_cond_t condc, condp;
@@ -34,9 +34,33 @@ void *child_worker(void *factory_ptr){
     // crit loop
     int i;
     for(i = 0; i < factory->candies_per_box_max; i++){
+        // if production is done, break the loop
+        // if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
+        //     printf("Child %s breaking loop...1\n", tid_str);
+        //     break_flag = 1;
+        //     pthread_exit(NULL);
+        //     return NULL;
+        // }
         pthread_mutex_lock(&the_mutex);
         while (buffer == 0 || factory->assembly_line_index == 0) {
+            printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
+            // print current while loop conditions
+            printf("buffer: %d\n", buffer);
+            // printf("assembly_line_index: %d\n", factory->assembly_line_index);
+            //             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
+            //     printf("Child %s breaking loop...2\n", tid_str);
+            //     break_flag = 1;
+            //     pthread_exit(NULL);
+            //     return NULL;
+            // }
             pthread_cond_wait(&condc, &the_mutex);
+            printf("Child %s is done waiting for a candy to take from the assembly line\n", tid_str);
+            if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
+                printf("Child %s breaking loop...3\n", tid_str);
+                break_flag = 1;
+                pthread_exit(NULL);
+                return NULL;
+            }
         }
         buffer = 0;
         //printf("buffer set to %d by Child %s\n", buffer, tid_str);
@@ -46,7 +70,7 @@ void *child_worker(void *factory_ptr){
         
         // debug: check the assembly line
         for (int j = 0; j < factory->assembly_line_max; j++) {
-            printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+            printf("Assembly line from child%s %d: %s\n",tid_str, j, factory->assembly_line[j]);
         }
         char *candy = factory->assembly_line[(factory->assembly_line_index)-1];
 
@@ -54,6 +78,10 @@ void *child_worker(void *factory_ptr){
         factory->assembly_line[factory->assembly_line_index] = "";
         factory->assembly_line_index--;
         printf("Child %s took candy (%s) from assembly line at index %d\n", tid_str, candy, factory->assembly_line_index);
+                // debug: check the assembly line
+        for (int j = 0; j < factory->assembly_line_max; j++) {
+            printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+        }
         // add the candy to the box
         candy_box[candy_box_index] = candy;
         candy_box_index++;
@@ -68,14 +96,25 @@ void *child_worker(void *factory_ptr){
             }
             printf("\n");
             candy_box_index = 0;
+            // debug: check the assembly line
+            // for (int j = 0; j < factory->assembly_line_max; j++) {
+            //     printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+            // }
         }
+
         // signal the producer
         pthread_cond_signal(&condp);
         pthread_mutex_unlock(&the_mutex);
         // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         // printf("Child %d added candy to box\n", i);
-        pthread_cond_signal(&condp);
-        pthread_mutex_unlock(&the_mutex);
     }
+
+
+    if (break_flag == 1 ) {
+        printf("Child %s is could not fill all boxes\n", tid_str);
+    }
+
+    printf("Child %s is done\n", tid_str);
+    pthread_exit(NULL);
+    return NULL;
 }
