@@ -23,7 +23,6 @@ void *oompa_loompa_worker(void *factory_ptr){
     // extern the global variables
     extern pthread_mutex_t the_mutex;
     extern pthread_cond_t condc, condp;
-    extern int buffer;
 
     // comfirm creation
     // printf("Oompa Loompa created\n");
@@ -52,19 +51,6 @@ void *oompa_loompa_worker(void *factory_ptr){
     for(i = 0; i < factory->candies_per_oompa_max; i++){
 
 
-        
-        pthread_mutex_lock(&the_mutex);
-        while (buffer != 0 || factory->assembly_line_index == factory->assembly_line_max) {
-           // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
-            pthread_cond_wait(&condp, &the_mutex);
-        }
-        buffer = 1;
-
-        //Debug: check the buffer
-        //printf("buffer set to %d by Oompa Loompa %s\n", buffer, tid_str);
-
-        // This is the critical section !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         // The suffix needs to be " - " + i
         sprintf(suffix, " - %d", i);
         //printf("Suffix: %s\n", suffix);
@@ -75,6 +61,15 @@ void *oompa_loompa_worker(void *factory_ptr){
         strcpy(current_candy, color);
         strcat(current_candy, suffix);
         // printf("Oompa Loompa %s created candy (%s)\n", tid_str, current_candy);
+
+        
+        pthread_mutex_lock(&the_mutex);
+        while (factory->assembly_line_index == factory->assembly_line_max) {
+           // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
+            pthread_cond_wait(&condp, &the_mutex);
+        }
+
+        // This is the critical section !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
         // put the candy on the assembly line in the factory 
@@ -92,13 +87,13 @@ void *oompa_loompa_worker(void *factory_ptr){
         //     printf("Assembly line from OL %d: %s\n", j, factory->assembly_line[j]);
         // }
 
-        // clear the current candy
-        strcpy(current_candy, "");
-
         // signal the consumer
         pthread_cond_signal(&condc);
         pthread_mutex_unlock(&the_mutex);
         // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // clear the current candy
+        strcpy(current_candy, "");
+
     }
 
 

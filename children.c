@@ -17,7 +17,6 @@ void *child_worker(void *factory_ptr){
     //extern the global variables
     extern pthread_mutex_t the_mutex;
     extern pthread_cond_t condc, condp;
-    extern int buffer;
 
     // print the memory address for this oompa loompa
     pthread_t rawid = pthread_self();
@@ -42,10 +41,9 @@ void *child_worker(void *factory_ptr){
         //     return NULL;
         // }
         pthread_mutex_lock(&the_mutex);
-        while (buffer == 0 || factory->assembly_line_index == 0) {
+        while (factory->assembly_line_index == 0) {
             printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
             // print current while loop conditions
-            printf("buffer: %d\n", buffer);
             // printf("assembly_line_index: %d\n", factory->assembly_line_index);
             //             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
             //     printf("Child %s breaking loop...2\n", tid_str);
@@ -62,26 +60,30 @@ void *child_worker(void *factory_ptr){
                 return NULL;
             }
         }
-        buffer = 0;
-        //printf("buffer set to %d by Child %s\n", buffer, tid_str);
+
         // This is the critical section !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // take the candy from the assembly line in the factory
         // find the candy in the assembly line
         
         // debug: check the assembly line
-        for (int j = 0; j < factory->assembly_line_max; j++) {
-            printf("Assembly line from child%s %d: %s\n",tid_str, j, factory->assembly_line[j]);
-        }
+        // for (int j = 0; j < factory->assembly_line_max; j++) {
+        //     printf("Assembly line from child%s %d: %s\n",tid_str, j, factory->assembly_line[j]);
+        // }
         char *candy = factory->assembly_line[(factory->assembly_line_index)-1];
 
         // remove the candy from the assembly line
         factory->assembly_line[factory->assembly_line_index] = "";
         factory->assembly_line_index--;
+        // signal the producer
+        pthread_cond_signal(&condp);
+        pthread_mutex_unlock(&the_mutex);
+        // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         printf("Child %s took candy (%s) from assembly line at index %d\n", tid_str, candy, factory->assembly_line_index);
-                // debug: check the assembly line
-        for (int j = 0; j < factory->assembly_line_max; j++) {
-            printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
-        }
+        // debug: check the assembly line
+        // for (int j = 0; j < factory->assembly_line_max; j++) {
+        //     printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+        // }
         // add the candy to the box
         candy_box[candy_box_index] = candy;
         candy_box_index++;
@@ -102,10 +104,6 @@ void *child_worker(void *factory_ptr){
             // }
         }
 
-        // signal the producer
-        pthread_cond_signal(&condp);
-        pthread_mutex_unlock(&the_mutex);
-        // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // printf("Child %d added candy to box\n", i);
     }
 
