@@ -7,8 +7,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
-// per email, random number generator is needed
-#include <time.h>
+
 
 void *child_worker(void *factory_ptr){
     // this should be similar to the consumer slide
@@ -19,15 +18,6 @@ void *child_worker(void *factory_ptr){
     //extern the global variables
     extern pthread_mutex_t the_mutex;
     extern pthread_cond_t condc, condp;
-
-    // per email, pick a random color from the color_names array
-    // seed the random number generator
-    srand(time(NULL));
-    // get a random number between 0 and 9
-    int random_index = rand() % 10;
-    // get the color from the array
-    char *color = factory->color_names[random_index];
-    printf("Child color: %s\n", color);
 
     // print the memory address for this oompa loompa
     pthread_t rawid = pthread_self();

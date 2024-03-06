@@ -32,16 +32,22 @@ void *oompa_loompa_worker(void *factory_ptr){
     pthread_t rawid = pthread_self();
     //printf("Oompa Loompa memory address: %lu\n", (unsigned long)rawid);
 
-    // Convert thread id to string
-    char tid_str[20];
-    sprintf(tid_str, "%lu", (unsigned long)rawid);
-    //printf("Oompa Loompa thread id: %s\n", tid_str);
+//     // Convert thread id to string
+//     char tid_str[20];
+//     sprintf(tid_str, "%lu", (unsigned long)rawid);
+//     //printf("Oompa Loompa thread id: %s\n", tid_str);
 
-    // create color string (color + tid)
-    char *color = malloc(strlen("color") + strlen(tid_str) + 1);
-    strcpy(color, "color");
-    strcat(color, tid_str);
-   // printf("Oompa Loompa color: %s\n", color);
+//     // create color string (color + tid)
+//     char *color = malloc(strlen("color") + strlen(tid_str) + 1);
+//     strcpy(color, "color");
+//     strcat(color, tid_str);
+//    // printf("Oompa Loompa color: %s\n", color);
+
+    // per email, we need to randomly pick a number from the color_names array
+    int color_index = rand() % 10;
+    char *color = malloc(strlen(factory->color_names[color_index]) + 1);
+    strcpy(color, factory->color_names[color_index]);
+    printf("Oompa Loompa color: %s\n", color);
 
     // Use the producer slide to run the critical section
     int i;
