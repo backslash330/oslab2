@@ -68,6 +68,13 @@ int main(int argc, char *argv[]) {
     printf("Candies per Box: %d\n", factory->candies_per_box_max);
     printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
 
+    // Per email, set ten color names (factory is char *color_names[10];)
+    char *colors[] = {"Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "White", "Black", "Grey"};
+    for (int i = 0; i < 10; i++) {
+        factory->color_names[i] = malloc(strlen(colors[i]) + 1);  // +1 for the null terminator
+        strcpy(factory->color_names[i], colors[i]);
+    }
+
     // create the assembly line (bounded-buffer array) of size assembly_line that holds strings
     char **assembly_line = malloc(factory->assembly_line_max * sizeof(char *));
     for (int i = 0; i < factory->assembly_line_max; i++) {

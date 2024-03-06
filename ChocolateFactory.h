@@ -33,4 +33,6 @@ typedef struct {
     int assembly_line_index;
     // this is for the case that their are less candies than the candies per box
     int done_production;
+    // Per email with Sahil, an array of ten color names is needed
+    char *color_names[10];
 } ChocolateFactory;
