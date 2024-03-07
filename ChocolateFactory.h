@@ -35,4 +35,7 @@ typedef struct {
     int done_production;
     // Per email with Sahil, an array of ten color names is needed
     char *color_names[10];
+    // Due to a deadlock where the assembly line is full and the children are complete
+    // we need a counter to keep track of the number of completed children
+    int completed_children;
 } ChocolateFactory;

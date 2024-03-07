@@ -71,7 +71,9 @@ void *child_worker(void *factory_ptr){
         //     printf("Assembly line from child%s %d: %s\n",tid_str, j, factory->assembly_line[j]);
         // }
         char *candy = factory->assembly_line[(factory->assembly_line_index)-1];
-
+        if (candy_box_index+1 == factory->candies_per_box_max) {
+            factory->completed_children++;
+        }
         // remove the candy from the assembly line
         factory->assembly_line[factory->assembly_line_index] = "";
         factory->assembly_line_index--;
@@ -100,9 +102,9 @@ void *child_worker(void *factory_ptr){
             printf("\n");
             candy_box_index = 0;
             // debug: check the assembly line
-            // for (int j = 0; j < factory->assembly_line_max; j++) {
-            //     printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
-            // }
+            for (int j = 0; j < factory->assembly_line_max; j++) {
+                printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+            }
         }
 
         // printf("Child %d added candy to box\n", i);
