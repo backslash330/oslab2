@@ -73,6 +73,12 @@ void *oompa_loompa_worker(void *factory_ptr){
         pthread_mutex_lock(&the_mutex);
         while (factory->assembly_line_index == factory->assembly_line_max) {
            // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
+                       if (factory->completed_children == factory->children_max) {
+                pthread_mutex_unlock(&the_mutex);
+                pthread_cond_broadcast(&condp);
+                pthread_exit(NULL);
+                return NULL;
+            }
             pthread_cond_wait(&condp, &the_mutex);
             // printf("Oompa Loompa %s is done waiting for a candy to take from the assembly line\n", tid_str);
             // If the assembly is full and the children are done, break the loop
@@ -122,7 +128,7 @@ void *oompa_loompa_worker(void *factory_ptr){
     free(current_candy);
     free(suffix);
 
-    // printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
+    printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
     pthread_exit(NULL);
     return NULL;
 }
