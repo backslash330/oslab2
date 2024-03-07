@@ -61,12 +61,12 @@ int main(int argc, char *argv[]) {
     factory->done_production = 0;
 
     // print the factory settings
-    printf("Factory Settings:\n");
-    printf("Oompa Loompas: %d\n", factory->oompa_loompas_max);
-    printf("Children: %d\n", factory->children_max);
-    printf("Assembly Line: %d\n", factory->assembly_line_max);
-    printf("Candies per Box: %d\n", factory->candies_per_box_max);
-    printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
+    // printf("Factory Settings:\n");
+    // printf("Oompa Loompas: %d\n", factory->oompa_loompas_max);
+    // printf("Children: %d\n", factory->children_max);
+    // printf("Assembly Line: %d\n", factory->assembly_line_max);
+    // printf("Candies per Box: %d\n", factory->candies_per_box_max);
+    // printf("Candies per Oompa: %d\n", factory->candies_per_oompa_max);
 
     // Per email, set ten color names (factory is char *color_names[10];)
     char *colors[] = {"Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "White", "Black", "Grey"};
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     // create the oompa loompas using pthread and oompa-loompa.c
     pthread_t oompa_loompa_threads[factory->oompa_loompas_max];
     for(int i = 0; i < factory->oompa_loompas_max; i++) {
-        printf("Creating oompa loompa %d...\n", i);
+        // printf("Creating oompa loompa %d...\n", i);
         status = pthread_create(&oompa_loompa_threads[i], NULL, oompa_loompa_worker, (void *)factory);
         if (status != 0) {
             printf("Oops.oompa loompa pthread_create returned error code %d\n", status);
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     // create the children using pthread and children.c
     pthread_t children_threads[factory->children_max];
     for(int i = 0; i < factory->children_max; i++) {
-        printf("Creating child %d...\n", i);
+        // printf("Creating child %d...\n", i);
         status = pthread_create(&children_threads[i], NULL, child_worker, (void *)factory);
         if (status != 0) {
             printf("Oops.children pthread_create returned error code %d\n", status);
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
         pthread_join(oompa_loompa_threads[i], NULL);
     }
 
-    printf("All oompa loompas compelte.\n");
+    // printf("All oompa loompas compelte.\n");
     // set factory to done production
     factory->done_production = 1;
     // wake all the children up
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
         pthread_join(children_threads[i], NULL);
     }
 
-    printf("All threads compelte.\n");
+    // printf("All threads compelte.\n");
 
     // free memory at the end
     pthread_cond_destroy(&condc);

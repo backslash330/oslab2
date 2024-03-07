@@ -47,7 +47,8 @@ void *oompa_loompa_worker(void *factory_ptr){
     int color_index = rand() % 10;
     char *color = malloc(strlen(factory->color_names[color_index]) + 1);
     strcpy(color, factory->color_names[color_index]);
-    printf("Oompa Loompa color: %s\n", color);
+    strcat(color, tid_str);
+    // printf("Oompa Loompa color: %s\n", color);
 
     // Use the producer slide to run the critical section
     int i;
@@ -73,10 +74,10 @@ void *oompa_loompa_worker(void *factory_ptr){
         while (factory->assembly_line_index == factory->assembly_line_max) {
            // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
             pthread_cond_wait(&condp, &the_mutex);
-            printf("Oompa Loompa %s is done waiting for a candy to take from the assembly line\n", tid_str);
+            // printf("Oompa Loompa %s is done waiting for a candy to take from the assembly line\n", tid_str);
             // If the assembly is full and the children are done, break the loop
-            printf("completed children: %d\n", factory->completed_children);
-            printf("children max: %d\n", factory->children_max);
+            // printf("completed children: %d\n", factory->completed_children);
+            // printf("children max: %d\n", factory->children_max);
             if (factory->completed_children == factory->children_max) {
                 pthread_mutex_unlock(&the_mutex);
                 pthread_cond_broadcast(&condp);
@@ -121,7 +122,7 @@ void *oompa_loompa_worker(void *factory_ptr){
     free(current_candy);
     free(suffix);
 
-    printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
+    // printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
     pthread_exit(NULL);
     return NULL;
 }

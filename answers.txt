@@ -1,0 +1,41 @@
+1. Start your program with 4 producers and 1 consumer. Does the ordering of the output 
+change between runs? If yes, briefly explain how the outputs are different.
+
+Yes, the ordering of the output changes between runs. The outputs are different because the threads are running concurrently and the order in which they are executed is not guaranteed.
+
+2. Repeat the experiment (question 1) with a background job running on the machine.
+Observe the ordering of the output and briefly report.
+
+The ordering is still non-deterministic. The background job does not affect the ordering of the output.
+
+3. Repeat tasks 1 & 2, this time with 4 producers and 3 consumers. Record your 
+observations and provide an explanation about why a multi-threaded program may 
+not produce deterministic output even though the inputs remain identical.
+
+I observed that the ordering is still non-deterministic.
+A mult-threaded program may not produce deterministic output even though the inputs remain identical because the threads are running concurrently and the order in which they are executed is not guaranteed.
+
+
+4. Repeat questions 1–3 on the virtual machine created in the first laboratory time. 
+Configure the virtual machine to only have one CPU. Briefly describe your output, 
+using a similar style as before.
+
+
+5. Compare and contrast single- vs multi-CPU execution of the bounded buffer problem.
+
+When using a single CPU, the output is still non-deterministic. The difference is that the threads are not running concurrently. The single CPU executes the threads one at a time. When using multiple CPUs, the output is still non-deterministic. The difference is that the threads are running concurrently. The order in which they are executed is not guaranteed.
+
+6. Document any hard problems you faced during the debugging of your multi-threaded 
+application. Did the non-deterministic nature of the program make the task of 
+debugging your code more difficult?
+
+The hardest problem I had while debugging this program was that a normal trace log becomes difficult with multiple threads. The non-deterministic nature of the program made the task of debugging my code more difficult because the order in which the threads are executed is not guaranteed..
+I had to step through the logic of the program in my head and use print statements to figure out what was going on.
+
+7. Briefly state what you learned from this lab as it relates to threading and interprocess 
+communication. ie. What is the conclusion of this lab?
+
+
+I don't want to work with threads.
+
+I also learned that working with interprocess communication is difficult and that it is important to understand how to use it properly. I also learned that the order in which threads are executed is not guaranteed and that this can cause problems when debugging a program.

@@ -43,7 +43,7 @@ void *child_worker(void *factory_ptr){
         // }
         pthread_mutex_lock(&the_mutex);
         while (factory->assembly_line_index == 0) {
-            printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
+            // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
             // print current while loop conditions
             // printf("assembly_line_index: %d\n", factory->assembly_line_index);
             //             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
@@ -53,7 +53,7 @@ void *child_worker(void *factory_ptr){
             //     return NULL;
             // }
             pthread_cond_wait(&condc, &the_mutex);
-            printf("Child %s is done waiting for a candy to take from the assembly line\n", tid_str);
+            // printf("Child %s is done waiting for a candy to take from the assembly line\n", tid_str);
             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
                 printf("Child %s breaking loop...3\n", tid_str);
                 break_flag = 1;
@@ -82,7 +82,7 @@ void *child_worker(void *factory_ptr){
         pthread_mutex_unlock(&the_mutex);
         // Critical section ends here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        printf("Child %s took candy (%s) from assembly line at index %d\n", tid_str, candy, factory->assembly_line_index);
+        // printf("Child %s took candy (%s) from assembly line at index %d\n", tid_str, candy, factory->assembly_line_index);
         // debug: check the assembly line
         // for (int j = 0; j < factory->assembly_line_max; j++) {
         //     printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
@@ -92,6 +92,7 @@ void *child_worker(void *factory_ptr){
         candy_box_index++;
         // if the box is full, print the box
         if(candy_box_index == factory->candies_per_box_max){
+            printf("Child %s is shouting\n", tid_str);
             printf("Wonka, I have a box of candies containing: ");
             for(int j = 0; j < factory->candies_per_box_max; j++){
                 printf("%s", candy_box[j]);
@@ -102,9 +103,9 @@ void *child_worker(void *factory_ptr){
             printf("\n");
             candy_box_index = 0;
             // debug: check the assembly line
-            for (int j = 0; j < factory->assembly_line_max; j++) {
-                printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
-            }
+            // for (int j = 0; j < factory->assembly_line_max; j++) {
+            //     printf("Assembly line from child %d: %s\n", j, factory->assembly_line[j]);
+            // }
         }
 
         // printf("Child %d added candy to box\n", i);
