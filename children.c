@@ -43,20 +43,19 @@ void *child_worker(void *factory_ptr){
         // }
         pthread_mutex_lock(&the_mutex);
         while (factory->assembly_line_index == 0) {
-            // printf("Child %s is waiting for a candy to take from the assembly line\n", tid_str);
-            // print current while loop conditions
-            // printf("assembly_line_index: %d\n", factory->assembly_line_index);
-            //             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
-            //     printf("Child %s breaking loop...2\n", tid_str);
-            //     break_flag = 1;
-            //     pthread_exit(NULL);
-            //     return NULL;
-            // }
+            if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
+                printf("Child %s breaking loop...3\n", tid_str);
+                pthread_mutex_unlock(&the_mutex);
+                pthread_cond_broadcast(&condp);
+                pthread_exit(NULL);
+                return NULL;
+            }
             pthread_cond_wait(&condc, &the_mutex);
             // printf("Child %s is done waiting for a candy to take from the assembly line\n", tid_str);
             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
                 printf("Child %s breaking loop...3\n", tid_str);
-                break_flag = 1;
+                pthread_mutex_unlock(&the_mutex);
+                pthread_cond_broadcast(&condc);
                 pthread_exit(NULL);
                 return NULL;
             }
