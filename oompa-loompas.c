@@ -32,16 +32,10 @@ void *oompa_loompa_worker(void *factory_ptr){
     pthread_t rawid = pthread_self();
     //printf("Oompa Loompa memory address: %lu\n", (unsigned long)rawid);
 
-//     // Convert thread id to string
+    // Convert thread id to string
     char tid_str[20];
     sprintf(tid_str, "%lu", (unsigned long)rawid);
-//     //printf("Oompa Loompa thread id: %s\n", tid_str);
 
-//     // create color string (color + tid)
-//     char *color = malloc(strlen("color") + strlen(tid_str) + 1);
-//     strcpy(color, "color");
-//     strcat(color, tid_str);
-//    // printf("Oompa Loompa color: %s\n", color);
 
     // per email, we need to randomly pick a number from the color_names array
     int color_index = rand() % 10;
@@ -97,18 +91,12 @@ void *oompa_loompa_worker(void *factory_ptr){
 
         // put the candy on the assembly line in the factory 
         // Add the value of current_candy to the assembly line, NOT the pointer
-        // since assembly line is a char **, it takes pointer to a char
-        // However, current_candy will be freed after the critical section, so we need to copy the value of current_candy to the assembly line
         factory->assembly_line[factory->assembly_line_index] = malloc(strlen(current_candy) + 1);
         strcpy(factory->assembly_line[factory->assembly_line_index], current_candy);
     
 
         // printf("Oompa Loompa %s added candy (%s) to assembly line at index %d\n", tid_str, current_candy, factory->assembly_line_index);
         factory->assembly_line_index++;
-                // debug: check the assembly line
-        // for (int j = 0; j < factory->assembly_line_max; j++) {
-        //     printf("Assembly line from OL %d: %s\n", j, factory->assembly_line[j]);
-        // }
 
         // signal the consumer
         pthread_cond_signal(&condc);
@@ -118,11 +106,7 @@ void *oompa_loompa_worker(void *factory_ptr){
         strcpy(current_candy, "");
 
     }
-
-
-    //There is a deadlock condition. If a child goes to sleep and the production is done, the child will never wake up.
-    // We therefore need to wake all the children up
-
+    
     // free the memory
     free(color);
     free(current_candy);
