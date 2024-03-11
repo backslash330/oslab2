@@ -53,13 +53,13 @@ void *oompa_loompa_worker(void *factory_ptr){
     // Use the producer slide to run the critical section
     int i;
     // we need a string which is " - " + i to use later
-    char *current_candy = malloc(strlen(color) + strlen(" - ") + 2);
-    char *suffix = malloc(strlen(" - ") + 2);
+    char *current_candy = malloc(strlen(color) + strlen(" ") + 2);
+    char *suffix = malloc(strlen(" ") + 2);
     for(i = 0; i < factory->candies_per_oompa_max; i++){
 
 
         // The suffix needs to be " - " + i
-        sprintf(suffix, " - %d", i);
+        sprintf(suffix, " %d", i);
         //printf("Suffix: %s\n", suffix);
 
 
@@ -128,7 +128,7 @@ void *oompa_loompa_worker(void *factory_ptr){
     free(current_candy);
     free(suffix);
 
-    printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
+    // printf("Oompa Loompa %lu done\n", (unsigned long)rawid);
     pthread_exit(NULL);
     return NULL;
 }

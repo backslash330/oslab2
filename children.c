@@ -44,7 +44,7 @@ void *child_worker(void *factory_ptr){
         pthread_mutex_lock(&the_mutex);
         while (factory->assembly_line_index == 0) {
             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
-                printf("Child %s breaking loop...3\n", tid_str);
+                // printf("Child %s breaking loop...3\n", tid_str);
                 pthread_mutex_unlock(&the_mutex);
                 pthread_cond_broadcast(&condp);
                 pthread_exit(NULL);
@@ -53,7 +53,7 @@ void *child_worker(void *factory_ptr){
             pthread_cond_wait(&condc, &the_mutex);
             // printf("Child %s is done waiting for a candy to take from the assembly line\n", tid_str);
             if (factory->done_production == 1 && factory->assembly_line_index < factory->candies_per_box_max-1) {
-                printf("Child %s breaking loop...3\n", tid_str);
+                // printf("Child %s breaking loop...3\n", tid_str);
                 pthread_mutex_unlock(&the_mutex);
                 pthread_cond_broadcast(&condc);
                 pthread_exit(NULL);
@@ -91,7 +91,7 @@ void *child_worker(void *factory_ptr){
         candy_box_index++;
         // if the box is full, print the box
         if(candy_box_index == factory->candies_per_box_max){
-            printf("Child %s is shouting\n", tid_str);
+            // printf("Child %s is shouting\n", tid_str);
             printf("Wonka, I have a box of candies containing: ");
             for(int j = 0; j < factory->candies_per_box_max; j++){
                 printf("%s", candy_box[j]);
@@ -115,7 +115,7 @@ void *child_worker(void *factory_ptr){
         printf("Child %s is could not fill all boxes\n", tid_str);
     }
 
-    printf("Child %s is done\n", tid_str);
+    // printf("Child %s is done\n", tid_str);
     pthread_exit(NULL);
     return NULL;
 }

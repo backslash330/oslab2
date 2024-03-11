@@ -138,6 +138,6 @@ int main(int argc, char *argv[]) {
     free(factory);
 
     // exit the program
-    printf("Ending program correctly.\n");
+    // printf("Ending program correctly.\n");
     return 0;
 }
